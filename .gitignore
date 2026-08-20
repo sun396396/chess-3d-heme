@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+
+# Godot
+.godot/
+*.translation
+
+# Build outputs (會在 GitHub Actions 或本地重 build)
+build/
+*.zip
+*.dmg
+*.exe
+*.app/
+
+# macOS
+.DS_Store
+._*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Export template cache
+export_templates/
+
+# Logs
+*.log

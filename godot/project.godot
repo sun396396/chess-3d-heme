@@ -1,0 +1,20 @@
+[application]
+
+config/name="Chess 3D - Heme Edition"
+config/description="3D 西洋棋 + 程式生成怪獸 + 即時合成音效"
+run/main_scene="res://Main.tscn"
+config/features=PackedStringArray("4.2", "GL Compatibility")
+config/icon="res://icon.svg"
+
+[audio]
+
+buses/default_bus_layout={"bus_0": {"name": "Master", "volume_db": 0.0}, "bus_1": {"name": "SFX", "volume_db": 0.0}, "bus_2": {"name": "Music", "volume_db": -10.0}}
+
+[autoload]
+
+SoundManager="*res://SoundManager.gd"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
