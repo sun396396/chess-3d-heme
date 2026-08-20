@@ -18,8 +18,9 @@ script = ExtResource("3_combat")
 [node name="PiecesRoot" type="Node3D" parent="."]
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.7, -0.7, 0, 0.7, 0.7, 0, 8, -8)
-fov = 50.0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -10)
+rotation_degrees = Vector3(-30, 180, 0)
+fov = 55.0
 current = true
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
