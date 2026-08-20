@@ -14,7 +14,15 @@
   to = "/index.html"
   status = 200
 
-# SPA fallback — 如果之後加更多頁面
+# ===== COOP/COEP 跨域隔離（Godot 4 Web SharedArrayBuffer 必須） =====
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Embedder-Policy = "require-corp"
+    Cross-Origin-Resource-Policy = "cross-origin"
+
+# SPA fallback — 安全 headers
 [[headers]]
   for = "/*"
   [headers.values]

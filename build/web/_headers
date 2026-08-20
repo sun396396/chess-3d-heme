@@ -1,0 +1,16 @@
+# Netlify _headers 檔（跟 netlify.toml 同步）
+# Godot 4 Web 需要 SharedArrayBuffer → COOP/COEP 必須
+
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
+  Cross-Origin-Resource-Policy: cross-origin
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+*.wasm
+  Content-Type: application/wasm
+
+*.js
+  Content-Type: application/javascript
