@@ -221,6 +221,9 @@ func _on_cell_clicked(r: int, c: int) -> void:
 		if result.ok:
 			SoundFactoryScript.play_sound(SoundFactoryScript.SoundType.MOVE)
 			_animate_move(fr, fc, r, c, result.captured)
+			# ⭐ 王車易位：額外搬車節點
+			if result.get("castled", false):
+				_animate_castle_rook(fr, fc, r, c)
 			selected = []
 		else:
 			# 不合法 → 重新選取
@@ -277,6 +280,28 @@ func _animate_move(fr: int, fc: int, tr: int, tc: int, captured: String) -> void
 	tween.tween_property(piece_node, "position", end_pos, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.tween_property(piece_node, "rotation:y", PI * 0.5, 0.2)
 	tween.tween_property(piece_node, "rotation:y", 0.0, 0.2).set_delay(0.2)
+
+# === 王車易位的車動畫 ===
+func _animate_castle_rook(fr: int, fc: int, tr: int, tc: int) -> void:
+	# tr/tc = 王的新位置 (g1 或 c1)
+	# 王從 fr/fc (e1) 走來
+	var row: int = tr
+	# 判斷短/長易位
+	var rook_from_col: int = 7 if tc == 6 else 0  # 短=h, 長=a
+	var rook_to_col: int = 5 if tc == 6 else 3     # 短=f, 長=d
+	var rook_node: Node3D = piece_nodes[row][rook_from_col]
+	if rook_node == null:
+		return
+	var rook_dest: Vector3 = _cell_to_world(row, rook_to_col)
+	rook_dest.y = 0.2
+
+	# 更新 piece_nodes
+	piece_nodes[row][rook_to_col] = rook_node
+	piece_nodes[row][rook_from_col] = null
+
+	# 平滑動畫
+	var tween: Tween = create_tween()
+	tween.tween_property(rook_node, "position", rook_dest, 0.4).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 # === 吃子戰鬥動畫 ===
 func _play_capture_combat(fr: int, fc: int, tr: int, tc: int, captured: String) -> void:

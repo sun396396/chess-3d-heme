@@ -227,6 +227,7 @@ func make_move(fr: int, fc: int, tr: int, tc: int) -> Dictionary:
 	board[fr][fc] = "."
 
 	# ⭐ 王車易位：把車一起搬
+	var castled: bool = false
 	if piece.to_lower() == "k" and abs(tc - fc) == 2 and fr == tr:
 		# 短易位：王從 e 到 g（col 4 → 6），車從 h 移到 f（col 7 → 5）
 		if tc == 6 and board[tr][7] == ("R" if color == "white" else "r"):
@@ -236,6 +237,7 @@ func make_move(fr: int, fc: int, tr: int, tc: int) -> Dictionary:
 				white_rook_h_moved = true
 			else:
 				black_rook_h_moved = true
+			castled = true
 		# 長易位：王從 e 到 c（col 4 → 2），車從 a 移到 d（col 0 → 3）
 		elif tc == 2 and board[tr][0] == ("R" if color == "white" else "r"):
 			board[tr][3] = board[tr][0]
@@ -244,6 +246,7 @@ func make_move(fr: int, fc: int, tr: int, tc: int) -> Dictionary:
 				white_rook_a_moved = true
 			else:
 				black_rook_a_moved = true
+			castled = true
 
 	# 兵升變（簡化：到底線自動變后）
 	if piece.to_lower() == "p" and (tr == 0 or tr == 7):
@@ -273,4 +276,4 @@ func make_move(fr: int, fc: int, tr: int, tc: int) -> Dictionary:
 		current_turn = "black"
 	else:
 		current_turn = "white"
-	return {"ok": true, "captured": captured}
+	return {"ok": true, "captured": captured, "castled": castled}
