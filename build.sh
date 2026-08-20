@@ -114,8 +114,9 @@ case "$PLATFORM" in
     web|html)
         echo -e "${YELLOW}[4/5] 打包 Web (HTML5)...${NC}"
         mkdir -p "$BUILD_DIR/web"
-        $GODOT_CMD --headless --export-release "Web" "$BUILD_DIR/web/Chess3D_Heme.html"
-        OUTPUT="$BUILD_DIR/web/Chess3D_Heme.html"
+        # 改名為 index.html 讓 Netlify 預設能找到入口
+        $GODOT_CMD --headless --export-release "Web" "$BUILD_DIR/web/index.html"
+        OUTPUT="$BUILD_DIR/web/index.html"
         ;;
     all)
         echo -e "${YELLOW}[4/5] 打包全部平台（會跑很久）...${NC}"
