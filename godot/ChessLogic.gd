@@ -2,6 +2,7 @@
 # 從 Python 移植過來的西洋棋核心邏輯
 # 作者：嘿美 🦉（主人的電競陪玩貓頭鷹）
 
+class_name ChessLogic
 extends Node
 
 # 棋盤狀態：8x8 二維陣列
@@ -63,6 +64,7 @@ func get_moves(r: int, c: int) -> Array:
 		var nr: int = r + direction
 		if in_bounds(nr, c) and get_piece(nr, c) == ".":
 			moves.append([nr, c])
+			# ⭐ 修法 1：兵第一步可走兩格
 			var nr2: int = r + 2 * direction
 			if r == start_row and get_piece(nr2, c) == ".":
 				moves.append([nr2, c])
@@ -136,7 +138,7 @@ func make_move(fr: int, fc: int, tr: int, tc: int) -> Dictionary:
 	board[tr][tc] = piece
 	board[fr][fc] = "."
 
-	# 兵升變
+	# 兵升變（簡化：到底線自動變后）
 	if piece.to_lower() == "p" and (tr == 0 or tr == 7):
 		if piece == piece.to_upper():
 			board[tr][tc] = "Q"
