@@ -165,18 +165,17 @@ func _apply_color(mesh_inst: MeshInstance3D, color: Color) -> void:
 	mesh_inst.material_override = mat
 
 func _cell_to_world(r: int, c: int) -> Vector3:
-	# 注意：西洋棋 board[r][c]，r=0 是黑方底線，r=7 是白方底線
-	# 翻轉一下讓白方在近處
+	# 白方 (r=7) 在 z 最大值（主人這邊 / 近相機）
+	# 黑方 (r=0) 在 z 最小值（對面 / 遠相機）
 	var x: float = BOARD_ORIGIN.x + c * CELL_SIZE
-	var z: float = BOARD_ORIGIN.z + (7 - r) * CELL_SIZE
+	var z: float = BOARD_ORIGIN.z + r * CELL_SIZE
 	return Vector3(x, 0, z)
 
 func _world_to_cell(world_pos: Vector3) -> Array:
-	# 注意：CELL_SIZE = 1.2，_cell_to_world 把棋格中心放在 c*CELL_SIZE + BOARD_ORIGIN
-	# 所以 world_pos.x == BOARD_ORIGIN.x + c * CELL_SIZE 時，c 為對應的 col
+	# 注意：白方 r=7 在 z 最大值（BOARD_ORIGIN.z + 7*CELL_SIZE）
+	# 黑方 r=0 在 z 最小值（BOARD_ORIGIN.z + 0）
 	var c: int = int(round((world_pos.x - BOARD_ORIGIN.x) / CELL_SIZE))
-	var r_inv: int = int(round((world_pos.z - BOARD_ORIGIN.z) / CELL_SIZE))
-	var r: int = 7 - r_inv
+	var r: int = int(round((world_pos.z - BOARD_ORIGIN.z) / CELL_SIZE))
 	if in_bounds(r, c):
 		return [r, c]
 	return [-1, -1]
