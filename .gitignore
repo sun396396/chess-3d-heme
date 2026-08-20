@@ -11,12 +11,19 @@ venv/
 .godot/
 *.translation
 
-# Build outputs (會在 GitHub Actions 或本地重 build)
-build/
+# Build outputs
 *.zip
 *.dmg
 *.exe
+# 排除大型 build artifacts
+build/
 *.app/
+*.dmg
+*.pkg
+# 但保留 build/web/ 給 Netlify deploy（必須在 build/ 規則之後才生效）
+!build/
+!build/web/
+!build/web/**
 
 # macOS
 .DS_Store

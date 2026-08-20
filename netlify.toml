@@ -1,0 +1,34 @@
+# Netlify 設定
+# 主人到 https://app.netlify.com/ 新增 site，
+# 連到 sun396396/chess-3d-heme repo，
+# 設定 Base directory = 留空
+# Build command = 留空（因為我們直接 deploy build/web/）
+# Publish directory = build/web
+# 按 Deploy！
+
+[build]
+  publish = "build/web"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# SPA fallback — 如果之後加更多頁面
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Godot wasm 需要正確的 MIME type
+[[headers]]
+  for = "*.wasm"
+  [headers.values]
+    Content-Type = "application/wasm"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Content-Type = "application/javascript"
