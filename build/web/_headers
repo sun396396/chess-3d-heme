@@ -9,41 +9,6 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
 
-# HTML 明確指定 text/html（覆蓋 Netlify 預設）
+# HTML（最重要 — 明確指定）
 *.html
   Content-Type: text/html; charset=utf-8
-  X-Frame-Options: DENY
-
-# CSS 明確指定
-*.css
-  Content-Type: text/css; charset=utf-8
-
-# JavaScript
-*.js
-  Content-Type: application/javascript
-
-# WebAssembly
-*.wasm
-  Content-Type: application/wasm
-
-# PNG
-*.png
-  Content-Type: image/png
-
-# ICO / Icon
-*.ico
-  Content-Type: image/x-icon
-
-# Apple touch icon
-*.apple-touch-icon.png
-  Content-Type: image/png
-
-# Worklet
-*.audio.worklet.js
-  Content-Type: application/javascript
-*.worker.js
-  Content-Type: application/javascript
-
-# 字體
-*.woff2
-  Content-Type: font/woff2
