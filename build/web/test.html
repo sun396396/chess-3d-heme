@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Hello Test</title>
+<style>
+body {
+  margin: 0;
+  padding: 50px;
+  background: #1a1a2e;
+  color: #00ff88;
+  font-family: -apple-system, sans-serif;
+  font-size: 48px;
+  text-align: center;
+}
+.green { color: #00ff88; font-size: 80px; font-weight: bold; }
+.box {
+  background: #16213e;
+  border: 3px solid #00ff88;
+  border-radius: 12px;
+  padding: 30px;
+  margin: 30px auto;
+  max-width: 800px;
+}
+</style>
+</head>
+<body>
+<div class="green">✅ Hello Test</div>
+<div class="box">
+如果你看到這個綠色「Hello Test」框框，代表：
+<br><br>
+✅ Chrome 正常
+<br>
+✅ JavaScript 已關閉也能看到（純 HTML）
+<br>
+✅ 視覺渲染正常
+</div>
+<div class="box" style="font-size: 24px;">
+下一步：<br>
+1. 按 F12 打開 DevTools<br>
+2. 切到 <b>Network</b> 標籤<br>
+3. 重新整理（Cmd+Shift+R）<br>
+4. 看 index.html / index.js / index.wasm 是不是都下載成功（綠色 200）
+</div>
+</body>
+</html>
