@@ -1,0 +1,6 @@
+# Netlify _redirects 檔
+# 注意：根 / 仍指向 chess (index.html)
+# 只有 /play-obby 或 /obby-game 指向 Obby
+
+/play-obby  /obby-game.html  200
+/obby  /obby-game.html  200
