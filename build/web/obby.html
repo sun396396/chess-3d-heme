@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>🩸 謝爾頓精神病院 Obby - 嘿美版</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Courier New', monospace;
+  background: #000;
+  color: #fff;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#game {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  background: radial-gradient(ellipse at center, #1a0d0d 0%, #000 80%);
+}
+
+/* 玩家 */
+#player {
+  position: absolute;
+  width: 40px;
+  height: 50px;
+  background: linear-gradient(to bottom, #4a90e2 0%, #2c5282 100%);
+  border: 2px solid #fff;
+  border-radius: 8px 8px 0 0;
+  transition: none;
+  z-index: 100;
+  box-shadow: 0 0 20px rgba(74, 144, 226, 0.5);
+}
+
+#player::before {
+  content: "👤";
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16px;
+}
+
+/* 平台 */
+.platform {
+  position: absolute;
+  background: linear-gradient(to bottom, #4a4a4a 0%, #2a2a2a 100%);
+  border: 1px solid #1a1a1a;
+  box-shadow: inset 0 -5px 10px rgba(0,0,0,0.5);
+}
+
+.platform.danger {
+  background: linear-gradient(to bottom, #6a0a0a 0%, #2a0202 100%);
+  border: 1px solid #ff0000;
+  animation: pulse-danger 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-danger {
+  0%, 100% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); }
+  50% { box-shadow: 0 0 30px rgba(255, 0, 0, 1); }
+}
+
+/* 終點 */
+.finish {
+  background: linear-gradient(to bottom, #ffd700 0%, #ff8c00 100%) !important;
+  border: 2px solid #fff !important;
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.8) !important;
+  animation: glow 1s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
+  50% { box-shadow: 0 0 80px rgba(255, 215, 0, 1); }
+}
+
+/* NPC */
+.npc {
+  position: absolute;
+  width: 45px;
+  height: 55px;
+  background: linear-gradient(to bottom, #6a0a0a 0%, #2a0202 100%);
+  border: 2px solid #ff0000;
+  border-radius: 8px 8px 0 0;
+  z-index: 90;
+  animation: npc-pulse 1s ease-in-out infinite;
+}
+
+.npc::before {
+  content: "🧟";
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+}
+
+@keyframes npc-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); }
+  50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 0, 0, 1); }
+}
+
+/* UI */
+#ui {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+#title {
+  font-size: 20px;
+  color: #ff5555;
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+#stats {
+  display: flex;
+  gap: 20px;
+  font-size: 18px;
+}
+
+.stat {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 8px 16px;
+  border: 1px solid #ff5555;
+  border-radius: 4px;
+}
+
+.stat .label { color: #888; }
+.stat .value { color: #fff; font-weight: bold; }
+
+/* 進度條 */
+#progress-bar {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 300px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #ff5555;
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+#progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to right, #4caf50 0%, #ffc107 50%, #f44336 100%);
+  transition: width 0.5s ease;
+}
+
+#progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px #000;
+  z-index: 1001;
+}
+
+/* 訊息 */
+#message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 36px;
+  font-weight: bold;
+  text-align: center;
+  color: #ff5555;
+  text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+#message.show {
+  opacity: 1;
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate(-50%, -50%); }
+  25% { transform: translate(-52%, -50%); }
+  75% { transform: translate(-48%, -50%); }
+}
+
+/* 跳嚇鬼臉 */
+#ghost {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 200px;
+  z-index: 2000;
+  pointer-events: none;
+  opacity: 0;
+  filter: drop-shadow(0 0 20px #f00);
+}
+
+#ghost.show {
+  animation: ghost-scare 0.8s;
+}
+
+@keyframes ghost-scare {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+}
+
+/* 螢幕震動 */
+.shake-screen { animation: screen-shake 0.5s; }
+@keyframes screen-shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-10px, 5px); }
+  50% { transform: translate(8px, -8px); }
+  75% { transform: translate(-5px, 10px); }
+}
+
+/* 燈光閃爍 */
+.lights-flicker { animation: flicker 0.15s; }
+@keyframes flicker {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(0.3); }
+}
+
+/* 控制說明 */
+#controls {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  font-size: 12px;
+  color: #666;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="ui">
+    <div id="title">🩸 謝爾頓精神病院 Obby - 嘿美版</div>
+    <div id="stats">
+      <div class="stat"><span class="label">⚡能量:</span> <span class="value" id="power">0</span></div>
+      <div class="stat"><span class="label">💰金幣:</span> <span class="value" id="coins">0</span></div>
+      <div class="stat"><span class="label">💀死亡:</span> <span class="value" id="deaths">0</span></div>
+    </div>
+  </div>
+
+  <div id="progress-bar">
+    <div id="progress-fill"></div>
+    <div id="progress-text">0%</div>
+  </div>
+
+  <div id="message"></div>
+  <div id="ghost">👻</div>
+
+  <div id="player"></div>
+
+  <div id="controls">
+    🎮 ← → / A D 移動 | SPACE 跳躍 | R 重生
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ========== 遊戲狀態 ==========
+const game = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+  player: { x: 100, y: 0, vx: 0, vy: 0, w: 40, h: 50, onGround: false, facing: 1 },
+  platforms: [],
+  checkpoints: [],
+  finish: null,
+  npc: null,
+  startX: 100, startY: 400,
+  currentCheckpoint: 1,
+  power: 0,
+  coins: 0,
+  deaths: 0,
+  progress: 0,
+  gameStarted: false,
+  gameComplete: false,
+  scareInterval: null,
+  lightInterval: null,
+  npcInterval: null,
+};
+
+const GRAVITY = 0.6;
+const JUMP = -14;
+const MOVE_SPEED = 4.5;
+const FRICTION = 0.85;
+const GROUND_Y = 400;
+
+// ========== 5 個關卡 + 障礙配置 ==========
+function buildLevels() {
+  game.platforms = [];
+  game.checkpoints = [];
+
+  // 起點平台
+  game.platforms.push({ x: 0, y: 480, w: 220, h: 40, type: 'normal', stage: 1 });
+
+  // ========== Stage 1: 寂靜走廊 (0-500) ==========
+  game.platforms.push({ x: 220, y: 510, w: 80, h: 20, type: 'normal', stage: 1 });
+  game.platforms.push({ x: 300, y: 530, w: 70, h: 20, type: 'normal', stage: 1 });
+  game.platforms.push({ x: 380, y: 510, w: 120, h: 20, type: 'normal', stage: 1 });
+  game.checkpoints.push({ x: 480, y: 480, num: 2, stage: 1, reward: { coins: 10, power: 5 } });
+
+  // ========== Stage 2: 心電圖病房 (500-1000) ==========
+  game.platforms.push({ x: 500, y: 480, w: 80, h: 40, type: 'normal', stage: 2 });
+  game.platforms.push({ x: 580, y: 510, w: 60, h: 20, type: 'normal', stage: 2 });
+  game.platforms.push({ x: 640, y: 540, w: 60, h: 20, type: 'normal', stage: 2 });
+  game.platforms.push({ x: 720, y: 510, w: 80, h: 20, type: 'moving', stage: 2, range: 60, speed: 0.06, origX: 720 });
+  game.platforms.push({ x: 840, y: 480, w: 100, h: 40, type: 'normal', stage: 2 });
+  game.checkpoints.push({ x: 950, y: 480, num: 3, stage: 2, reward: { coins: 20, power: 10 } });
+
+  // ========== Stage 3: 地下停屍間 (1000-1500) ==========
+  game.platforms.push({ x: 1000, y: 480, w: 80, h: 40, type: 'normal', stage: 3 });
+  game.platforms.push({ x: 1090, y: 500, w: 50, h: 20, type: 'disappearing', stage: 3, visible: true, timer: 0 });
+  game.platforms.push({ x: 1150, y: 520, w: 50, h: 20, type: 'disappearing', stage: 3, visible: true, timer: 60 });
+  game.platforms.push({ x: 1210, y: 480, w: 100, h: 20, type: 'spinning', stage: 3, angle: 0, ox: 1260, oy: 460, length: 120 });
+  game.platforms.push({ x: 1340, y: 480, w: 80, h: 40, type: 'normal', stage: 3 });
+  game.platforms.push({ x: 1430, y: 510, w: 60, h: 20, type: 'normal', stage: 3 });
+  game.checkpoints.push({ x: 1480, y: 480, num: 4, stage: 3, reward: { coins: 30, power: 20 } });
+
+  // ========== Stage 4: 瘋人院牢房 (1500-2100) ==========
+  game.platforms.push({ x: 1500, y: 480, w: 80, h: 40, type: 'normal', stage: 4 });
+  game.platforms.push({ x: 1590, y: 510, w: 60, h: 20, type: 'normal', stage: 4 });
+  game.platforms.push({ x: 1670, y: 480, w: 80, h: 20, type: 'spinning', stage: 4, angle: Math.PI/2, ox: 1710, oy: 460, length: 80 });
+  game.platforms.push({ x: 1780, y: 510, w: 60, h: 20, type: 'moving', stage: 4, range: 40, speed: 0.08, origX: 1780 });
+  game.platforms.push({ x: 1870, y: 480, w: 100, h: 40, type: 'normal', stage: 4 });
+  game.checkpoints.push({ x: 1960, y: 480, num: 5, stage: 4, reward: { coins: 50, power: 30 } });
+
+  // ========== Stage 5: 自由 (2100-2500) ==========
+  game.platforms.push({ x: 2100, y: 460, w: 150, h: 60, type: 'normal', stage: 5 });
+  game.platforms.push({ x: 2300, y: 480, w: 200, h: 40, type: 'normal', stage: 5 });
+
+  // 終點
+  game.finish = { x: 2400, y: 450, w: 100, h: 50 };
+
+  // NPC 起始位置
+  game.npc = { x: 1800, y: 430, w: 45, h: 55, vx: 0, active: false };
+}
+
+// ========== 鍵盤控制 ==========
+const keys = {};
+window.addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if (e.code === 'KeyR') respawn();
+  if (e.code === 'Space' && game.player.onGround) {
+    game.player.vy = JUMP;
+    game.player.onGround = false;
+  }
+});
+window.addEventListener('keyup', e => keys[e.code] = false);
+
+// ========== 觸控按鈕（手機） ==========
+window.addEventListener('touchstart', e => {
+  if (e.touches[0].clientX < game.width / 3) keys['ArrowLeft'] = true;
+  else if (e.touches[0].clientX < 2 * game.width / 3) keys['Space'] = true;
+  else keys['ArrowRight'] = true;
+});
+window.addEventListener('touchend', e => {
+  keys['ArrowLeft'] = keys['ArrowRight'] = false;
+  if (keys['Space'] && game.player.onGround) {
+    game.player.vy = JUMP;
+    game.player.onGround = false;
+    keys['Space'] = false;
+  }
+});
+
+// ========== 物理 ==========
+function update() {
+  if (!game.gameStarted || game.gameComplete) return;
+
+  const p = game.player;
+  p.vx *= FRICTION;
+  if (keys['ArrowLeft'] || keys['KeyA']) { p.vx = -MOVE_SPEED; p.facing = -1; }
+  if (keys['ArrowRight'] || keys['KeyD']) { p.vx = MOVE_SPEED; p.facing = 1; }
+
+  p.vy += GRAVITY;
+  p.x += p.vx;
+  p.y += p.vy;
+
+  // 邊界
+  if (p.x < 0) p.x = 0;
+
+  // 死亡（掉下去）
+  if (p.y > game.height + 100) {
+    die();
+    return;
+  }
+
+  // 更新移動平台
+  for (const plat of game.platforms) {
+    if (plat.type === 'moving' && plat.origX !== undefined) {
+      plat.x = plat.origX + Math.sin(plat.timer * plat.speed) * plat.range;
+      plat.timer++;
+    }
+    if (plat.type === 'disappearing') {
+      plat.timer++;
+      if (plat.timer > 120) { plat.visible = !plat.visible; plat.timer = 0; }
+    }
+    if (plat.type === 'spinning') {
+      plat.angle += 0.04;
+    }
+  }
+
+  // 碰撞檢測
+  p.onGround = false;
+  for (const plat of game.platforms) {
+    if (plat.type === 'disappearing' && !plat.visible) continue;
+
+    let platX = plat.x, platY = plat.y, platW = plat.w, platH = plat.h;
+    if (plat.type === 'spinning') {
+      // 簡化：用旋轉中心的邊界框
+      platX = plat.ox - plat.length / 2;
+      platW = plat.length;
+    }
+
+    // 玩家從上方落下
+    if (p.x + p.w > platX && p.x < platX + platW) {
+      if (p.y + p.h >= platY && p.y + p.h <= platY + platH + p.vy + 5 && p.vy >= 0) {
+        p.y = platY - p.h;
+        p.vy = 0;
+        p.onGround = true;
+      }
+    }
+  }
+
+  // 旋轉平台（更精確的碰撞：玩家在旋轉半徑內）
+  for (const plat of game.platforms) {
+    if (plat.type === 'spinning') {
+      const dx = (p.x + p.w/2) - plat.ox;
+      const dy = (p.y + p.h/2) - plat.oy;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist > plat.length/2 - 30 && dist < plat.length/2 + 5) {
+        // 碰到旋轉橫桿 → 死亡
+        die();
+        return;
+      }
+    }
+  }
+
+  // 移動平台（玩家站在上面要跟著動）
+  for (const plat of game.platforms) {
+    if (plat.type === 'moving' && p.onGround) {
+      if (p.x + p.w > plat.x && p.x < plat.x + plat.w &&
+          Math.abs((p.y + p.h) - plat.y) < 5) {
+        p.x += Math.cos(plat.timer * plat.speed) * plat.range * plat.speed;
+      }
+    }
+  }
+
+  // Checkpoint 偵測
+  for (const cp of game.checkpoints) {
+    if (cp.num > game.currentCheckpoint) {
+      if (p.x + p.w/2 > cp.x - 30 && p.x + p.w/2 < cp.x + 30 &&
+          p.y + p.h > cp.y - 30 && p.y + p.h < cp.y + 60) {
+        game.currentCheckpoint = cp.num;
+        game.coins += cp.reward.coins;
+        game.power += cp.reward.power;
+        showMessage(`✨ Checkpoint ${cp.num}!\n+${cp.reward.coins} 金幣 +${cp.reward.power} 能量`);
+        updateUI();
+      }
+    }
+  }
+
+  // 終點偵測
+  if (game.finish && p.x + p.w/2 > game.finish.x && p.x < game.finish.x + game.finish.w) {
+    completeObby();
+  }
+
+  // NPC 追逐
+  if (game.npc) {
+    if (!game.npc.active && game.currentCheckpoint >= 4) {
+      game.npc.active = true;
+    }
+    if (game.npc.active) {
+      const npcX = game.npc.x + 22;
+      const npcY = game.npc.y + 27;
+      const playerX = p.x + p.w/2;
+      const playerY = p.y + p.h/2;
+      const dx = playerX - npcX;
+      const dy = playerY - npcY;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+
+      if (dist < 500 && dist > 40) {
+        // 追
+        game.npc.vx = (dx / dist) * 2;
+      } else {
+        game.npc.vx = 0;
+      }
+      game.npc.x += game.npc.vx;
+
+      if (dist < 40) {
+        die();
+        return;
+      }
+    }
+  }
+
+  updateUI();
+}
+
+function die() {
+  game.deaths++;
+  showMessage('💀 你在黑暗中永遠消失了...');
+  setTimeout(() => respawn(), 800);
+}
+
+function respawn() {
+  // 回到最後 checkpoint
+  const cp = game.checkpoints.find(c => c.num === game.currentCheckpoint) || { x: game.startX, y: game.startY };
+  game.player.x = cp.x;
+  game.player.y = cp.y - 100;
+  game.player.vx = 0;
+  game.player.vy = 0;
+}
+
+function completeObby() {
+  game.gameComplete = true;
+  game.coins += 100;
+  game.power += 50;
+  updateUI();
+  showMessage('🎉 你逃出了謝爾頓精神病院！\n+100 金幣 +50 能量');
+}
+
+function showMessage(text) {
+  const m = document.getElementById('message');
+  m.textContent = text;
+  m.classList.add('show');
+  setTimeout(() => m.classList.remove('show'), 2500);
+}
+
+function showGhost() {
+  document.getElementById('game').classList.add('shake-screen');
+  const g = document.getElementById('ghost');
+  g.classList.add('show');
+  setTimeout(() => {
+    g.classList.remove('show');
+    document.getElementById('game').classList.remove('shake-screen');
+  }, 800);
+}
+
+function flickerLights() {
+  const game = document.getElementById('game');
+  game.classList.add('lights-flicker');
+  setTimeout(() => game.classList.remove('lights-flicker'), 150);
+}
+
+function updateUI() {
+  document.getElementById('power').textContent = game.power;
+  document.getElementById('coins').textContent = game.coins;
+  document.getElementById('deaths').textContent = game.deaths;
+  const progress = Math.min(1, game.player.x / 2400);
+  document.getElementById('progress-fill').style.width = (progress * 100) + '%';
+  document.getElementById('progress-text').textContent = Math.floor(progress * 100) + '%';
+}
+
+// ========== 渲染 ==========
+function render() {
+  const game = document.getElementById('game');
+
+  // 清除舊的 platform 元素
+  game.querySelectorAll('.platform, .finish, .npc').forEach(el => el.remove());
+
+  // 渲染平台
+  for (const plat of game.platforms) {
+    if (plat.type === 'disappearing' && !plat.visible) continue;
+
+    const div = document.createElement('div');
+    div.className = 'platform';
+
+    if (plat.type === 'spinning') {
+      // 旋轉平台：用旋轉中心 + 角度
+      const cos = Math.cos(plat.angle);
+      const sin = Math.sin(plat.angle);
+      const w = plat.length, h = 20;
+      div.style.width = w + 'px';
+      div.style.height = h + 'px';
+      div.style.left = (plat.ox - w/2) + 'px';
+      div.style.top = (plat.oy - h/2) + 'px';
+      div.style.transform = `rotate(${plat.angle}rad)`;
+      div.style.transformOrigin = 'center';
+      div.style.background = 'linear-gradient(to bottom, #6a6a6a 0%, #2a2a2a 100%)';
+      div.style.border = '1px solid #ff5555';
+    } else {
+      div.style.width = plat.w + 'px';
+      div.style.height = plat.h + 'px';
+      div.style.left = plat.x + 'px';
+      div.style.top = plat.y + 'px';
+    }
+
+    if (plat.type === 'danger') div.classList.add('danger');
+    game.appendChild(div);
+  }
+
+  // 終點
+  if (game.finish) {
+    const finish = document.createElement('div');
+    finish.className = 'platform finish';
+    finish.style.width = game.finish.w + 'px';
+    finish.style.height = game.finish.h + 'px';
+    finish.style.left = game.finish.x + 'px';
+    finish.style.top = game.finish.y + 'px';
+    finish.textContent = '🚪';
+    finish.style.fontSize = '40px';
+    finish.style.display = 'flex';
+    finish.style.alignItems = 'center';
+    finish.style.justifyContent = 'center';
+    game.appendChild(finish);
+  }
+
+  // NPC
+  if (game.npc && game.npc.active) {
+    const npc = document.createElement('div');
+    npc.className = 'npc';
+    npc.style.left = game.npc.x + 'px';
+    npc.style.top = game.npc.y + 'px';
+    game.appendChild(npc);
+  }
+
+  // 玩家
+  const player = document.getElementById('player');
+  player.style.left = game.player.x + 'px';
+  player.style.top = game.player.y + 'px';
+
+  // 相機跟隨
+  const cameraX = -game.player.x + game.width / 3;
+  const cameraY = -game.player.y + game.height / 2;
+  game.querySelectorAll('.platform, .finish, .npc, #player').forEach(el => {
+    if (el.id === 'player') {
+      el.style.transform = `scaleX(${game.player.facing})`;
+    } else {
+      const originalLeft = parseFloat(el.style.left);
+      const originalTop = parseFloat(el.style.top);
+      el.style.left = (originalLeft + cameraX) + 'px';
+      el.style.top = (originalTop + cameraY) + 'px';
+    }
+  });
+}
+
+// ========== 遊戲循環 ==========
+function gameLoop() {
+  update();
+  render();
+  requestAnimationFrame(gameLoop);
+}
+
+// ========== 跳嚇系統 ==========
+function startScareSystem() {
+  game.scareInterval = setInterval(() => {
+    const types = ['shake', 'ghost', 'flicker', 'blackout'];
+    const type = types[Math.floor(Math.random() * types.length)];
+
+    if (type === 'shake') {
+      document.getElementById('game').classList.add('shake-screen');
+      setTimeout(() => document.getElementById('game').classList.remove('shake-screen'), 500);
+    } else if (type === 'ghost') {
+      showGhost();
+    } else if (type === 'flicker') {
+      flickerLights();
+    } else if (type === 'blackout') {
+      document.body.style.background = '#000';
+      setTimeout(() => { document.body.style.background = ''; }, 200);
+    }
+  }, 8000 + Math.random() * 7000);
+}
+
+// ========== 啟動 ==========
+function startGame() {
+  showMessage('3... 2... 1... GO!');
+  setTimeout(() => {
+    showMessage('🏃 開始逃跑！');
+    game.gameStarted = true;
+    startScareSystem();
+  }, 3000);
+}
+
+buildLevels();
+gameLoop();
+setTimeout(startGame, 1000);
+</script>
+</body>
+</html>
